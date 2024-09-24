@@ -1,0 +1,46 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI with Scandium
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - name: Run Scandium Test
+        run: |
+          response=$(curl -X POST -H "Content-Type: application/json" -H "x-api-token: gbZpew6o8b06z4GWgcaviToLqcKHJO" -d '{"project_id": "99c98722-91d0-4741-8723-9f55dfb525cf", "suite_id": "9ba18afc-b714-4da6-ba5b-b9f445467f5b","browser": "chrome","screenshot": true,"strategy": "await","variables": {"username": "sdk", "age": 11},"retry": 0}' "https://scr.getscandium.com/suites/execute")
+          status=$(echo "$response" | jq -r .data.result.status)
+          message=$(echo "$response" | jq -r .message)
+
+          if [ "$status" = "success" ]; then
+            echo "Test ran successfully. Status: $status"
+          else
+            echo "Test ran with failure. Status: $status"
+            exit 1
+          fi
+        env:
+          CURL_CA_BUNDLE: /etc/ssl/certs/ca-certificates.crt # Set the CA certificates bundle path
+
+      # - name: Install jq
+      #   run: |
+      #     sudo apt-get update -y
+      #     sudo apt-get install -y jq
