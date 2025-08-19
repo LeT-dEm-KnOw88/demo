@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
+  schedule:
+    - cron: '0 19 * * *'  # Runs at 7:00 PM UTC on August 19th
 
 jobs:
   execute-scandium-script:
@@ -42,3 +44,5 @@ jobs:
       - name: Run the Scandium Script
         run: |
           ./scandium_script.sh
+
+          
